@@ -1,0 +1,29 @@
+Урок 1
+
+
+1. Установка утилит для компиляции
+sudo apt install gcc make perl
+
+
+2. Установка guest additions
+cd VBox_GAs_6.1.12/
+ls
+sudo ./autorun.sh
+sudo reboot
+
+
+3. Установка openssh-server
+sudo apt install openssh-server
+
+
+4. Подключение по ssh по паролю
+В терминале:
+$ ssh ekaterina@192.168.1.134
+
+5. Подключение по ssh по ключу
+Нужен для более безопасного соединения без ввода пароля.
+
+ssh-keygen
+ssh-copy-id ekaterina@192.168.1.134
+ssh ekaterina@192.168.1.134 
+Подключился
