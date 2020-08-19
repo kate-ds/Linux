@@ -1,0 +1,62 @@
+1. Выяснить, для чего предназначена команда cat. Используя только данную команду, потоки ввода-вывода и их перенаправление:
+- создайте два файла с данными, а затем объедините их в один.
+
+  148  echo "Hello world!" > 1.txt
+  149  echo "Salut a tous!" > 2.txt
+  148  echo "Hello world!" > 1.txt
+  149  echo "Salut a tous!" > 2.txt
+  153  cat 1.txt 2.txt > 3.txt
+
+- просмотрите содержимое созданного файла.
+
+  153  cat 1.txt 2.txt > 3.txt
+
+- скопируйте файл, дав ему новое имя.
+
+  153  cat 1.txt 2.txt > 3.txt
+
+2. В ОС Linux скрытыми файлами считаются те, имена которых начинаются с символа точки .. Напишите команду, которая будет показывать количество скрытых файлов в домашнем каталоге пользователя. При необходимости используйте конвейер (пайплайн). Подсказка: для подсчета количества строк можно использовать wc). Количество скрытых файлов во вложенных папках считать не нужно.
+
+  160  ls -ld ~/.* | grep -v '^d' | wc -l
+    
+3. Создаем свой веб калькулятор. 
+3.1 Используя команду curl загрузить и сохранить на Ubuntu скрипт по ссылке
+https://raw.githubusercontent.com/mtuktarov/linux_goodies/master/docker/python/uwsgi/flaskapp.py
+
+  182  curl https://raw.githubusercontent.com/mtuktarov/linux_goodies/master/docker/python/uwsgi/flaskapp.py -o flaskapp.py 
+
+3.2 Попытаться запустить скрипт, используя полный путь (абсолютный) или относительный (./<script_name>), добавив права на выполнение при необходимости
+
+  190  chmod +x flaskapp.py 
+  191  ll
+  192  ./flaskapp.py 
+  193  pwd
+  194  /home/ekaterina/Downloads/flaskapp.py 
+
+3.3 В Ubuntu по умолчанию нет python 2 и скрипт может не запуститься. Решите эту проблемы, пользуясь материалами занятий.
+
+  196  sudo apt install python2
+
+3.4 При необходимости установите отсутствующие модули, используя программу pip (помним, что при python3 - pip3), которую, вероятно, придется тоже установить =)
+
+  211  curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py
+  212  sudo python2 get-pip.py
+  213  pip install flask
+
+3.5 Просмотрите код программы и найдите, какая переменная окружения используется для указания адреса, на котором программа слушает входящие запросы. Поменяйте адрес по умолчанию на тот IP адрес ubuntu, который доступен с хоста и убедитесь, что можете открыть программу со стороны хоста. Код самой python программы менять не нужно
+
+  222  sudo ln -s /usr/bin/python2 /usr/bin/python
+  146  sudo ufw allow 5000
+  150  echo "export FLASK_HOST=172.20.10.2" >> ~/.bashrc 
+  153  source ~/.bashrc 
+
+3.6 Сделайте так, чтобы калькулятор можно было запустить из любого рабочего каталога командной строки, используя одно только название. Настройка должна быть устойчива к перезагрузке.
+
+  158  export PATH=$PATH:/home/ekaterina/Downloads
+  159  source ~/.bashrc 
+  161  env | grep PATH
+  162  flaskapp.py 
+  166  echo "export PATH=$PATH:/home/ekaterina/Downloads" >> ~/.bashrc 
+  167  source ~/.bashrc 
+  169  cd /var/
+  170  flaskapp.py 
