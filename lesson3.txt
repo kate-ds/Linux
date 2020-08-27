@@ -1,0 +1,73 @@
+1. Управление пользователями:
+
+a) создать пользователя user1, указав shell /bin/bash и создав домашний каталог, используя утилиту useradd; 
+
+ 193  sudo useradd -m -s /bin/bash user1
+ 194  cat /etc/passwd
+ 
+b) создать пользователя user2, указав shell /bin/bash и создав домашний каталог, используя утилиту используя утилиту adduser; 
+
+ 202  sudo adduser user2
+ 203  cat /etc/passwd
+
+c) удалить пользователя user1 вместе с домашним каталогом, используя утилиту userdel;
+
+ 198  sudo userdel -rf user1
+ 
+d) создать пользователя user1, указав основную группу user2
+
+ 205  sudo useradd user1 -m -s /bin/bash -g user2
+ 206  cat /etc/passwd
+ 207  groups user1
+
+d) сменить пароль user1 одного из созданных пользователей, используя passwd
+
+ 211  sudo su user2
+	 1  whoami
+	 2  passwd 
+	 3  exit
+	 
+e) сменить пароль user2 одного из созданных пользователей, используя usermod
+
+ 215  sudo usermod -p $(openssl passwd -6 newpass) user2
+ 216  su - user2
+
+2. Управление группами:
+
+a) создать группы group1, group2 с использованием groupadd; 
+
+  186  sudo groupadd group1
+  187  cat /etc/group
+  188  sudo groupadd group2
+  189  cat /etc/group
+  
+b) добавить user1 в группы group1, group2 разом при помощи одной команды usermod, не меняя его основной группы;
+
+  219  sudo usermod -aG group1,group2 user1
+  220  groups user1
+
+с) создать группу user1 с GID=1516 и сделать ее основной для пользователя user1
+
+  222  sudo groupadd -g 1516 user1
+  223  groups
+  225  cat /etc/group
+  227  sudo usermod -g user1 user1
+  228  groups user1
+
+3. Создать пользователя с правами суперпользователя. Сделать так, чтобы sudo не требовал пароль для выполнения команд.
+
+  250  sudo adduser new1
+  256  sudo visudo /etc/sudoers.d/new1
+
+			GNU nano  /etc/sudoers.d/new1.tmp    
+	%sudo   ALL=(ALL:ALL) ALL
+
+	new1    ALL=(ALL:ALL) NOPASSWD:ALL
+
+4. * Используя дополнительные материалы, выдать одному из созданных пользователей право на выполнение ряда команд, требующих прав суперпользователя (команды выбираем на своё усмотрение).
+
+  266  sudo visudo /etc/sudoers.d/user1
+		    
+			GNU nano  /etc/sudoers.d/user1.tmp                                        
+	user1   ALL=(ALL:ALL)   /usr/bin/apt, /usr/bin/systemctl
+
