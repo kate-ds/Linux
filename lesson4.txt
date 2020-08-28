@@ -1,0 +1,88 @@
+1. Прочитать в методическом пособии о сигналах. 
+Запустить в одном терминале программу nano. В другом терминале посмотреть PID процесса (используйте ps aux) и остановить с помощью kill, посылая разные типы сигналов (SIGHUP, SIGTERM, SIGSEGV, SIGILL). Чем отличается заверщение программы в зависимости от сигнала?
+
+SIGHUB - сигнал, посылаемый процессу для уведомления о потере соединения с управляющим терминалом пользователя
+% ps aux | grep nano
+ekateri+    3172  0.0  0.1  18400  3800 pts/1    S+   14:59   0:00 nano
+ekateri+    3278  0.0  0.0  17668   660 pts/2    S+   15:00   0:00 grep nano
+% kill -1 3172
+ % nano
+Received SIGHUP or SIGTERM
+
+SIGTERM - сигнал для запроса завершения процесса
+ % ps aux | grep nano
+ekateri+    3359  0.0  0.1  18400  3984 pts/1    S+   15:21   0:00 nano
+ekateri+    3361  0.0  0.0  17668   664 pts/2    S+   15:21   0:00 grep nano
+ekaterina@ekaterina-VirtualBox ~
+ % kill -15 3359
+ % nano
+Received SIGHUP or SIGTERM
+
+SIGSEGV - сигнал, посылаемый процессу при ошибках сегментации.
+% ps aux | grep nano
+ekateri+    3371  0.0  0.1  18400  3812 pts/1    S+   15:22   0:00 nano
+ekateri+    3373  0.0  0.0  17668   728 pts/2    S+   15:23   0:00 grep nano
+ekaterina@ekaterina-VirtualBox ~
+ % kill -11 3371
+ % nano
+Sorry! Nano crashed!  Code: 11.  Please report a bug.
+
+SIGILL - сигнал, посылаемый процессу при попытке выполнить неправильно сформированную, несуществующую или привилегированную инструкцию.
+% ps aux | grep nano
+ekateri+    3387  0.0  0.1  18400  3948 pts/1    S+   15:30   0:00 nano
+ekaterina@ekaterina-VirtualBox ~
+ % kill -4 3387
+
+zsh: illegal hardware instruction (core dumped)  nano
+                                                     %                                                                                                                               ekaterina@ekaterina-VirtualBox ~
+ %
+
+
+2. Самостоятельно найти информацию о том, какой сигнал посылается запущенной программе при нажатии комбинации ctrl+c и ctrl+d. Создайте файл при помощи команды cat > file_name, напишите текст и завершите комбинацией ctrl+d. Какой сигнал передадим процессу?
+
+ctrl+c - SIGINT (2)
+ctrl+d - EOF (end of file)
+
+ekaterina@ekaterina-VirtualBox ~
+ % cat > file_name
+Helo world!%
+ 
+Какой сигнал передадим процессу? - EOF
+
+3. Изменить конфигурационный файл службы SSH: /etc/ssh/sshd_config, отключив аутентификацию по паролю PasswordAuthentication no. Выполните рестарт службы systemctl restart sshd (service sshd restart), верните аутентификацию по паролю, выполните reload службы systemctl reload sshd (services sshd reload). В чём различие между действиями restart и reload?
+
+   48  sudo visudo /etc/ssh/sshd_config
+   PasswordAuthentication no
+   50  sudo systemctl restart sshd
+   51  sudo systemctl status sshd
+   ● ssh.service - OpenBSD Secure Shell server
+        Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+        Active: active (running) since Thu 2020-08-27 15:44:11 MSK; 10s ago
+          Docs: man:sshd(8)
+                man:sshd_config(5)
+       Process: 3719 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+      Main PID: 3736 (sshd)
+         Tasks: 1 (limit: 2319)
+        Memory: 1.1M
+        CGroup: /system.slice/ssh.service
+                └─3736 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+   52  sudo visudo /etc/ssh/sshd_config
+   #PasswordAuthentication yes
+   53  sudo systemctl reload sshd
+   54  sudo systemctl status sshd
+   ● ssh.service - OpenBSD Secure Shell server
+        Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+        Active: active (running) since Thu 2020-08-27 15:44:11 MSK; 2min 40s ago
+          Docs: man:sshd(8)
+                man:sshd_config(5)
+       Process: 3719 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+       Process: 3753 ExecReload=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+       Process: 3754 ExecReload=/bin/kill -HUP $MAINPID (code=exited, status=0/SUCCESS)
+      Main PID: 3736 (sshd)
+         Tasks: 1 (limit: 2319)
+        Memory: 1.3M
+        CGroup: /system.slice/ssh.service
+                └─3736 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+   
+   restart перезапускает весь сервис
+   reload перезагружает конфигурацию из файла не перезапуская сервис
