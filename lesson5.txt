@@ -1,0 +1,143 @@
+1. Создание ссылок:
+- создать файл file1 и наполнить его произвольным содержимым.
+- скопировать файл file1 в file2.
+- создать символическую ссылку file3 на file1.
+- создать жесткую ссылку file4 на file1.
+- посмотреть, какие айноды у файлов.
+- удалить file1. Что стало с остальными созданными файлами? Попробовать вывести их содержимое на экран.
+- удалить все остальные файлы
+
+   94  echo "Hello world" > file1
+   97  cat file1 > file2
+   99  ln -s file1 file3
+  100  ln file1 file4
+  101  ls -lih
+  	total 12K
+  	288182 -rw-rw-r-- 2 ekaterina ekaterina 12 авг 29 10:43 file1
+  	288209 -rw-rw-r-- 1 ekaterina ekaterina 12 авг 29 10:50 file2
+  	288211 lrwxrwxrwx 1 ekaterina ekaterina  5 авг 29 10:50 file3 -> file1
+  	288182 -rw-rw-r-- 2 ekaterina ekaterina 12 авг 29 10:43 file4
+  103  rm file1
+  104  ls -lih
+  	total 8,0K
+  	288209 -rw-rw-r-- 1 ekaterina ekaterina 12 авг 29 10:50 file2
+  	288211 lrwxrwxrwx 1 ekaterina ekaterina  5 авг 29 10:50 file3 -> file1
+  	288182 -rw-rw-r-- 1 ekaterina ekaterina 12 авг 29 10:43 file4
+  105  cat file2 file3 file4
+  	Hello world
+  	cat: file3: No such file or directory
+  	Hello world
+  107  rm file*
+
+2. Работа со ссылками:
+- создать файл file1 и наполнить его произвольным содержимым.
+- создать символическую ссылку file1_link, указывающую на этот файл.
+- переместить ссылку в другую директорию. Работает ли она? Почему? Если не работает, как сделать так, чтобы работала?
+
+  111  echo "Hello world" > file1
+  113  ln -s file1 file1_link
+  115  ls -lih
+  	total 4,0K
+  	288196 -rw-rw-r-- 1 ekaterina ekaterina 12 авг 29 11:02 file1
+  	288209 lrwxrwxrwx 1 ekaterina ekaterina  5 авг 29 11:02 file1_link -> file1
+  116  mv file1_link ..
+  118  cat ../file1_link
+  	cat: ../file1_link: No such file or directory 
+	не работает, так как необходимо указать абсолютный путь к файлу
+  125  ln -s $(pwd)/file1 file1_link
+  126  mv file1_link ..
+  127  cd ..
+  130  cat file1_link
+  	Hello world
+
+3. Права файлов:
+- создать два произвольных файла.
+- первому файлу присвоить права на чтение, запись для владельца и группы; на чтение для всех. Сделать это в численном и символьном виде.
+- второму файлу присвоить права на чтение, запись только для владельца. Сделать это в численном и символьном виде.
+
+  146  touch new_file{1,2}
+  156  chmod a=r,ug=rw new_file1
+  157  ls -la
+  	total 8
+  	drwxrwxr-x  2 ekaterina ekaterina 4096 авг 29 11:36 .
+  	drwxr-xr-x 19 ekaterina ekaterina 4096 авг 29 11:43 ..
+  	-rw-rw-r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file1
+  	-rw-rw-r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file2
+  158  chmod 664 new_file1
+  159  ls -la
+  	total 8
+  	drwxrwxr-x  2 ekaterina ekaterina 4096 авг 29 11:36 .
+  	drwxr-xr-x 19 ekaterina ekaterina 4096 авг 29 11:46 ..
+  	-rw-rw-r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file1
+  	-rw-rw-r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file2
+  162  chmod a=r,u+w new_file2
+  163  ls -la
+  	total 8
+  	drwxrwxr-x  2 ekaterina ekaterina 4096 авг 29 11:36 .
+  	drwxr-xr-x 19 ekaterina ekaterina 4096 авг 29 11:48 ..
+  	-rw-rw-r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file1
+  	-rw-r--r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file2
+  164  chmod 644 new_file2
+  165  ls -la
+  	total 8
+  	drwxrwxr-x  2 ekaterina ekaterina 4096 авг 29 11:36 .
+  	drwxr-xr-x 19 ekaterina ekaterina 4096 авг 29 11:48 ..
+  	-rw-rw-r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file1
+  	-rw-r--r--  1 ekaterina ekaterina    0 авг 29 11:36 new_file2
+
+4. * Создать группу developer, несколько пользователей, входящих в эту группу. Создать директорию для совместной работы. Сделать так, чтобы созданные одними пользователями файлы могли изменять другие пользователи этой группы.
+
+  176  sudo groupadd Developer
+  180  sudo adduser developer1
+  183  sudo adduser developer2
+  189  sudo usermod -aG Developer developer1
+  190  sudo usermod -aG Developer developer2
+  191  cat /etc/group | grep Developer
+  	Developer:x:1517:developer1,developer2
+  194  sudo mkdir -p /develop
+  196  sudo chgrp -R Developer /develop
+  197  sudo chmod -R 2775 /develop
+  
+5. * Создать в директории для совместной работы поддиректорию для обмена файлами, но чтобы удалять файлы могли только их создатели.
+
+  199  sudo mkdir -p /develop/new_develop
+  200  ls -la /develop
+  	total 12
+  	drwxrwsr-x  3 root Developer 4096 авг 29 12:45 .
+  	drwxr-xr-x 21 root root      4096 авг 29 12:29 ..
+  	drwxr-sr-x  2 root Developer 4096 авг 29 12:45 new_develop
+  202  sudo chmod -R 1775 /develop/new_develop
+  203  ls -la /develop
+  	drwxrwsr-x  3 root Developer 4096 авг 29 12:45 .
+  	drwxr-xr-x 21 root root      4096 авг 29 12:29 ..
+  	drwxrwsr-t  2 root Developer 4096 авг 29 12:45 new_develop
+
+6. * Создать директорию, в которой есть несколько файлов. Сделать так, чтобы открыть файлы можно только, зная имя файла, а через ls список файлов посмотреть нельзя.
+
+  206  sudo mkdir -p /develop/new2_develop
+  207  ls -la /develop
+  	total 16
+  	drwxrwsr-x  4 root Developer 4096 авг 29 13:04 .
+  	drwxr-xr-x 21 root root      4096 авг 29 12:29 ..
+  	drwxr-sr-x  2 root Developer 4096 авг 29 13:04 new2_develop
+  	drwxrwsr-t  2 root Developer 4096 авг 29 12:45 new_develop
+  208  sudo chmod  1333 /develop/new2_develop
+  209  ls -la /develop
+  	total 16
+  	drwxrwsr-x  4 root Developer 4096 авг 29 13:04 .
+  	drwxr-xr-x 21 root root      4096 авг 29 12:29 ..
+  	d-wx-ws-wt  2 root Developer 4096 авг 29 13:08 new2_develop
+  	drwxrwsr-t  2 root Developer 4096 авг 29 12:45 new_develop
+  210  cd /develop/new2_develop
+  211  touch file{1,2,3}
+  212  echo "text1" > file1
+  213  echo "text2" > file2
+  214  echo "text3" > file3
+  215  ls -la
+ 	ls: cannot open directory '.': Permission denied
+  216  cat file1
+  	text1
+  218  cat file1 file2 file3
+  	text1
+  	text2
+  	text3
