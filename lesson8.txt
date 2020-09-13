@@ -20,9 +20,40 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.1/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 mkdir django
+cd django
+445  git clone https://github.com/mtuktarov/linux_goodies.git
+cp ~/linux_goodies/docker/django-test-app .
+
+ % nano Dockerfile
+FROM python:3
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /code
+WORKDIR /code
+COPY requirements.txt /code/
+RUN pip install -r requirements.txt
+COPY . /code/%
 
 
+nano docker-compose.yml
+version: '3'
 
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    build: .
+    command: python3 composeexample/manage.py runserver 0.0.0.0:8000
+    command: python3 composeexample/manage.py migrate
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
 
-3 *. Запустить контейнер так, чтобы приложение было доступным из браузера вашего хоста (Mac/Windows), а база данных, которая лежит в файле db.sqlite3 сохраняла свое состояние между запусками разных экземпляров контейнеров из созданного образа.
-Примечание: Задания с 5 по 7 даны для тех, кому упражнений 1-4 показалось недостаточно.
+docker-compose run web django-test-app/manage.py startproject composeexample
+docker-compose up
