@@ -14,5 +14,15 @@
 You have 15 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, polls, sessions.
 Run 'python manage.py migrate' to apply them.
 
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.27.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+mkdir django
+
+
+
+
 3 *. Запустить контейнер так, чтобы приложение было доступным из браузера вашего хоста (Mac/Windows), а база данных, которая лежит в файле db.sqlite3 сохраняла свое состояние между запусками разных экземпляров контейнеров из созданного образа.
 Примечание: Задания с 5 по 7 даны для тех, кому упражнений 1-4 показалось недостаточно.
