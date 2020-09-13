@@ -1,0 +1,18 @@
+1. Используя программы cron и write, настроить отправку сообщения Hi there вашему пользователю от пользователя root каждые 15 минут.
+
+	GNU nano 4.8             send_hello.sh
+	#!/bin/bash
+
+	write ekaterina pts/3 <<< "Hi there!"
+
+	sudo crontab -e
+	*/15 * * * * root /home/ekaterina/send_hello.sh
+
+
+2. Написать Dockerfile для сборки образа, который будет запускать контейнер с django приложением, доуступным по ссылке: https://github.com/mtuktarov/linux_goodies/tree/master/docker/django-test-app. Для запуска приложения необходимо и достаточно использовать файлы в указанной директории. Изменять код не нужно. Само приложение можно попытаться сначала запустить на Linux хосте, используя команду python manage.py runserver 0.0.0.0:8000. Обратите внимание, что в директории есть файл requirements.txt. Самостоятельно разберитесь для чего он нужен. Не забудьте избавиться от ошибки, которая появится при старте:
+
+You have 15 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, polls, sessions.
+Run 'python manage.py migrate' to apply them.
+
+3 *. Запустить контейнер так, чтобы приложение было доступным из браузера вашего хоста (Mac/Windows), а база данных, которая лежит в файле db.sqlite3 сохраняла свое состояние между запусками разных экземпляров контейнеров из созданного образа.
+Примечание: Задания с 5 по 7 даны для тех, кому упражнений 1-4 показалось недостаточно.
