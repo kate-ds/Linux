@@ -1,0 +1,59 @@
+1. Используя программы cron и write, настроить отправку сообщения Hi there вашему пользователю от пользователя root каждые 15 минут.
+
+	GNU nano 4.8             send_hello.sh
+	#!/bin/bash
+
+	write ekaterina pts/3 <<< "Hi there!"
+
+	sudo crontab -e
+	*/15 * * * * root /home/ekaterina/send_hello.sh
+
+
+2. Написать Dockerfile для сборки образа, который будет запускать контейнер с django приложением, доуступным по ссылке: https://github.com/mtuktarov/linux_goodies/tree/master/docker/django-test-app. Для запуска приложения необходимо и достаточно использовать файлы в указанной директории. Изменять код не нужно. Само приложение можно попытаться сначала запустить на Linux хосте, используя команду python manage.py runserver 0.0.0.0:8000. Обратите внимание, что в директории есть файл requirements.txt. Самостоятельно разберитесь для чего он нужен. Не забудьте избавиться от ошибки, которая появится при старте:
+
+You have 15 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, polls, sessions.
+Run 'python manage.py migrate' to apply them.
+
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.27.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+mkdir django
+cd django
+445  git clone https://github.com/mtuktarov/linux_goodies.git
+cp ~/linux_goodies/docker/django-test-app .
+
+ % nano Dockerfile
+FROM python:3
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /code
+WORKDIR /code
+COPY requirements.txt /code/
+RUN pip install -r requirements.txt
+COPY . /code/%
+
+
+nano docker-compose.yml
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    build: .
+    command: python3 composeexample/manage.py runserver 0.0.0.0:8000
+    command: python3 composeexample/manage.py migrate
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+docker-compose run web django-test-app/manage.py startproject composeexample
+docker-compose up
